@@ -2,7 +2,7 @@
 title: "Format columns"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{format_columns}
+  %\VignetteIndexEntry{Format columns}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -28,12 +28,68 @@ The example below shows that `colformat_md()` function parses markdown texts in 
 data.frame(
   x = c("**bold**", "*italic*"),
   y = c("^superscript^", "~subscript~"),
-  z = c("***~ft~^Extra^** is*", "*Cool*"),
+  z = c("*[**~ft~^Extra^**](https://ftextra.atusy.net/) is*", "*Cool*"),
   stringsAsFactors = FALSE
 ) %>%
   as_flextable() %>%
   colformat_md()
 ```
 
-Currently, **bold**, *italic*, ^superscript^, and ~subscript~ are supported.
+Currently, **bold**, *italic*, ^superscript^, ~subscript~, and link are well supported.
 Note that other syntax may result in unexpected behaviors.
+The ftExtra package does not support multiple paragraphs or block elements other than the paragraph.
+
+## Image
+
+You can also insert images.
+As markdown is parsed by pandoc, width and/or height attributes can be specified.
+Specifying one of them changes the other while keeping the aspect ratio.
+
+```{r}
+data.frame(
+  R = c("![](https://www.r-project.org/logo/Rlogo.png){width=.5} is the great language"),
+  stringsAsFactors = FALSE
+) %>%
+  as_flextable() %>%
+  colformat_md() %>%
+  flextable::autofit()
+```
+
+The R logo is distributed by The R Foundation with the [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) license.
+
+## Line breaks
+
+By default, soft line breaks becomes spaces.
+
+```{r}
+data.frame(linebreak = c("a\nb"), stringsAsFactors = FALSE) %>%
+  as_flextable() %>%
+  colformat_md()
+```
+
+Pandoc's markdown supports hard line breaks by adding a backslash or double spaces at the end of a line.
+
+```{r}
+data.frame(linebreak = c("a\\\nb"), stringsAsFactors = FALSE) %>%
+  as_flextable() %>%
+  colformat_md()
+```
+
+It is also possible to make `\n` as a hard line break by extending Pandoc's Markdown.
+
+```{r}
+data.frame(linebreak = c("a\nb"), stringsAsFactors = FALSE) %>%
+  as_flextable() %>%
+  colformat_md(.from = "markdown+hard_line_breaks")
+```
+
+## Emoji
+
+Pandoc's markdown provides an extension, `'emoji'`.
+To use it with `colformat_md()`, specify `markdown+emoji`.
+
+```{r}
+data.frame(emoji = c(":+1:"), stringsAsFactors = FALSE) %>%
+  as_flextable() %>%
+  colformat_md(.from = "markdown+emoji")
+```
