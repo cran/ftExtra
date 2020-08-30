@@ -1,6 +1,6 @@
 Package: ftExtra
 Title: Extensions for 'Flextable'
-Version: 0.0.2
+Version: 0.0.3
 Authors@R: 
   c(person(given = "Atsushi",
            family = "Yasumoto",
@@ -29,9 +29,9 @@ LazyData: true
 RoxygenNote: 7.1.1
 SystemRequirements: pandoc (>= 1.12.3) - http://pandoc.org
 NeedsCompilation: no
-Packaged: 2020-08-29 06:59:22 UTC; rstudio
+Packaged: 2020-08-29 13:27:26 UTC; rstudio
 Author: Atsushi Yasumoto [aut, cph, cre]
     (<https://orcid.org/0000-0002-8335-495X>),
   Romain François [ctb] (<https://orcid.org/0000-0002-2444-4226>)
 Repository: CRAN
-Date/Publication: 2020-08-29 07:20:03 UTC
+Date/Publication: 2020-08-30 01:00:22 UTC

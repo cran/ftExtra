@@ -1,7 +1,8 @@
 ## ---- include = FALSE---------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = rmarkdown::pandoc_available() && ("dplyr" %in% rownames(installed.packages()))
 )
 
 ## ----setup--------------------------------------------------------------------
