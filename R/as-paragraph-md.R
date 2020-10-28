@@ -1,7 +1,7 @@
 header <- flextable::as_paragraph("")[[1L]][-1L, ]
 
 vertical_align <- function(sup, sub) {
-  .f <- rep(FALSE, max(1, length(sup), length(sub)))
+  .f <- rep(FALSE, max(1L, length(sup), length(sub)))
   sup <- sup %||% .f
   sub <- sub %||% .f
   dplyr::if_else(
@@ -30,38 +30,76 @@ image_size <- function(x, y = "width") {
   as.numeric(pandoc_attrs(x, y))
 }
 
-parse_md <- function(x, .from = "markdown", auto_color_link = "blue") {
-  if (!is.character(auto_color_link) || length(auto_color_link) != 1) {
+parse_md <- function(x,
+                     auto_color_link = "blue",
+                     pandoc_args = NULL,
+                     .from = "markdown",
+                     .footnote_options = NULL) {
+  if (!is.character(auto_color_link) || length(auto_color_link) != 1L) {
     stop("`auto_color_link` must be a string")
   }
 
-  ast <- md2ast(x, .from = .from)
-
-  if ((ast$blocks[[1]]$t != "Para") || (length(ast$blocks) > 1)) {
-    stop("Markdown text must be a single paragraph")
+  filters <- if (rmarkdown::pandoc_available("2")) {
+    c(
+      "--lua-filter",
+      system.file("lua/smart.lua", package = "ftExtra"),
+      "--lua-filter",
+      system.file("lua/inline-code.lua", package = "ftExtra"),
+      "--lua-filter",
+      system.file("lua/math.lua", package = "ftExtra"),
+      paste0("--metadata=pandoc-path:", rmarkdown::pandoc_exec()),
+      if (!rmarkdown::pandoc_available("2.10")) {
+        paste0("--metadata=temporary-directory:", tempdir())
+      }
+    )
   }
 
-  y <- ast %>%
-    ast2df() %>%
-    as.list()
+  md_df <- md2df(x, pandoc_args = c(filters, pandoc_args), .from = .from)
 
+  if (is.null(.footnote_options) || (all(names(md_df) != "Note"))) {
+    y <- md_df
+  } else {
+    .footnote_options$n <- .footnote_options$n + 1L
+    ref <- data.frame(txt = .footnote_options$ref[[.footnote_options$n]],
+                      Superscript = TRUE,
+                      stringsAsFactors = FALSE)
+    .footnote_options$value <- c(
+      .footnote_options$value,
+      list(construct_chunk(as.list(dplyr::bind_rows(ref, md_df[md_df$Note, ])),
+                           auto_color_link))
+    )
+    y <- dplyr::bind_rows(md_df[!md_df$Note, ], ref)
+  }
 
+  construct_chunk(as.list(y), auto_color_link)
+}
+
+construct_chunk <- function(x, auto_color_link = "blue") {
   dplyr::bind_rows(
     header,
     data.frame(
-      txt = y$txt,
-      italic = y$Emph %||% NA,
-      bold = y$Strong %||% NA,
-      url = y$Link %||% NA_character_,
-      width = image_size(y$Image, "width"),
-      height = image_size(y$Image, "height"),
-      vertical.align = vertical_align(y$Superscript, y$Subscript),
+      txt = x$txt,
+      italic = x$Emph %||% NA,
+      bold = x$Strong %||% NA,
+      url = x$Link %||% NA_character_,
+      width = image_size(x$Image, "width"),
+      height = image_size(x$Image, "height"),
+      vertical.align = vertical_align(x$Superscript, x$Subscript),
+      underlined = x$underlined %||% NA,
+      color = x$color %||% NA_character_,
+      shading.color = x$shading.color %||% NA_character_,
+      font.family = x$font.family %||% NA_character_,
       stringsAsFactors = FALSE
     )
   ) %>%
     dplyr::mutate(
-      color = dplyr::if_else(is.na(url), NA_character_, auto_color_link),
-      img_data = y$Image %||% list(NULL)
+      color = dplyr::if_else(
+        is.na(.data$color) & !is.na(.data$url),
+        auto_color_link,
+        .data$color
+      ),
+      img_data = x$Image %||% list(NULL),
+      seq_index = dplyr::row_number()
     )
 }
 
@@ -71,8 +109,15 @@ parse_md <- function(x, .from = "markdown", auto_color_link = "blue") {
 #'
 #' @param x A character vector.
 #' @param auto_color_link A color of the link texts.
+#' @param md_extensions
+#'   Pandoc's extensions. Although it is prefixed with "md", extensions for any
+#'   formats specified to `.from` can be used. See
+#'   <https://www.pandoc.org/MANUAL.html#extensions> for details.
 #' @param .from
 #'   Pandoc's `--from` argument (default: `'markdown+autolink_bare_uris'`).
+#' @param ...
+#'   Arguments passed to internal functions.
+#' @inheritParams rmarkdown::html_document
 #'
 #' @examples
 #' if (rmarkdown::pandoc_available()) {
@@ -89,9 +134,14 @@ parse_md <- function(x, .from = "markdown", auto_color_link = "blue") {
 #' @export
 as_paragraph_md <- function(x,
                             auto_color_link = "blue",
-                            .from = "markdown+autolink_bare_uris") {
-  structure(
-    lapply(x, parse_md, .from = .from, auto_color_link = auto_color_link),
-    class = "paragraph"
-  )
+                            md_extensions = NULL,
+                            pandoc_args = NULL,
+                            .from = "markdown+autolink_bare_uris",
+                            ...) {
+  structure(lapply(x, parse_md,
+                   auto_color_link = auto_color_link,
+                   pandoc_args = pandoc_args,
+                   .from = paste0(.from, paste(md_extensions, collapse="")),
+                   ...),
+            class = "paragraph")
 }

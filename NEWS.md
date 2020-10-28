@@ -1,3 +1,17 @@
+# ftExtra 0.1.0
+
+* Support markdown footnote with `colformat_md`. Currently, one footnote per a cell is allowed, and it must be located at the end of the cell content (#22).
+* Add `footnote_options()` to configure options for footnotes (#23).
+* Support formatting markdown texts on header with `colformat_md(part = "header")` (#23).
+* Support single- and double-quotes by a lua filter (dfc82e0).
+* Support attributes with Span, Link, and Code. Useful attributes include the `.underline` class and the `color`, `shading.color`, and `font.family` attributes (#24).
+* Support inline code (#25).
+* Add the `md_extensions` and `pandoc_args` arguments to `colformat_md()` and `as_paragraph_md()` (#26, #29).
+* Support citation. Bibliography can be inherited from YAML front matter of an Rmd file (#27, #29).
+* Support math on macOS and Linux (#30), and on Windows (#31).
+* Fix character corruptions on Windows by forcing UTF8 (#31).
+* Use pandoc citeproc when YAML frontmatter contains the bibliography field (#31).
+
 # ftExtra 0.0.3
 
 * Patched to pass "CRAN Package Check Results for Package" where `r-patched-solaris-x86` fails because of missing pandoc.

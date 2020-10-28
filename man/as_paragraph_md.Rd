@@ -7,7 +7,10 @@
 as_paragraph_md(
   x,
   auto_color_link = "blue",
-  .from = "markdown+autolink_bare_uris"
+  md_extensions = NULL,
+  pandoc_args = NULL,
+  .from = "markdown+autolink_bare_uris",
+  ...
 )
 }
 \arguments{
@@ -15,7 +18,15 @@ as_paragraph_md(
 
 \item{auto_color_link}{A color of the link texts.}
 
+\item{md_extensions}{Pandoc's extensions. Although it is prefixed with "md", extensions for any
+formats specified to \code{.from} can be used. See
+\url{https://www.pandoc.org/MANUAL.html#extensions} for details.}
+
+\item{pandoc_args}{Additional command line options to pass to pandoc}
+
 \item{.from}{Pandoc's \code{--from} argument (default: \code{'markdown+autolink_bare_uris'}).}
+
+\item{...}{Arguments passed to internal functions.}
 }
 \description{
 Parse markdown cells and returns the "paragraph" object.
