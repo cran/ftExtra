@@ -7,7 +7,54 @@ knitr::opts_chunk$set(
 )
 
 ## ----setup--------------------------------------------------------------------
+library(flextable)
 library(ftExtra)
+
+## -----------------------------------------------------------------------------
+df <- data.frame(Oxide = c("SiO2", "Al2O3"), stringsAsFactors = FALSE)
+ft <- flextable::flextable(df)
+
+ft %>%
+  flextable::compose(
+    i = 1, j = "Oxide",
+    value = flextable::as_paragraph(
+      "SiO", as_sub("2")
+    )
+  ) %>%
+  flextable::compose(
+    i = 2, j = "Oxide",
+    value = flextable::as_paragraph(
+      "Al", as_sub("2"), "O", as_sub("3")
+    )
+  )
+
+## -----------------------------------------------------------------------------
+df <- data.frame(Oxide = c("SiO2", "Fe2O3"), stringsAsFactors = FALSE)
+ft <- flextable::flextable(df)
+
+for (i in seq(nrow(df))) {
+  ft <- flextable::compose(
+    ft, i = i, j = "Oxide",
+    value = flextable::as_paragraph(
+      list_values = df$Oxide[i] %>%
+        stringr::str_replace_all("([2-9]+)", " \\1 ") %>%
+        stringr::str_split(" ", simplify = TRUE) %>%
+        purrr::map_if(
+          function(x) stringr::str_detect(x, "[2-9]+"),
+          flextable::as_sub
+        )
+    )
+  )
+}
+ft
+
+## -----------------------------------------------------------------------------
+df <- data.frame(Oxide = c("SiO2", "Fe2O3"), stringsAsFactors = FALSE)
+
+df %>%
+  dplyr::mutate(Oxide = stringr::str_replace_all(Oxide, "([2-9]+)", "~\\1~")) %>%
+  flextable::flextable() %>%
+  ftExtra::colformat_md()
 
 ## -----------------------------------------------------------------------------
 data.frame(
@@ -49,7 +96,7 @@ data.frame(
 
 ## -----------------------------------------------------------------------------
 data.frame(
-  R = c("![](https://www.r-project.org/logo/Rlogo.png){width=.5} is the great language"),
+  R = sprintf("![](%s)", system.file("img", "Rlogo.jpg", package="jpeg")),
   stringsAsFactors = FALSE
 ) %>%
   as_flextable() %>%
@@ -71,7 +118,7 @@ data.frame(linebreak = c("a\nb"), stringsAsFactors = FALSE) %>%
   as_flextable() %>%
   colformat_md(md_extensions = "+hard_line_breaks")
 
-## ---- echo=FALSE, collapse=FALSE, out.class="bib", warning=FALSE--------------
+## ---- echo=FALSE, collapse=FALSE, class.output="bibtex", warning=FALSE, comment=""----
 knitr::write_bib("ftExtra")
 
 ## ---- eval=FALSE--------------------------------------------------------------
