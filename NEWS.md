@@ -1,5 +1,27 @@
-# ftExtra 0.1.1
+# ftExtra 0.2.0
 
+## Breaking changes
+
+* Drop supports for Pandoc versions < 2.0.6 in order to reduce maintenance costs. (#59).
+
+## New features
+
+* `colformat_md` supports multiple paragraphs by collapsing them with a separator given to the `.sep` argument (default: `"\n\n") (#43).
+* `colformat_md` can now automatically add citations to reference on R Markdown (#48).
+* `colformat_md` can now contain cells with multiple footnotes. In addition, footnote keys are placed exactly the same place of source. The previous implementation moved the keys to the end of corresponding cells (#51).
+* `as_paragraph_md` supports variety of input formats by checking enabled extensions (#54).
+
+## Bug fixes
+
+* Fix `colformat_md(pandoc_args = c("--bibliography", "example.bib"))` should work even if bibliography field is missing from the YAML front matter (#41).
+
+## Internal changes
+
+* Drop **jpeg** package from suggests, which is formerly used in a vignette (#42).
+* `colformat_md` converts cells to Pandoc's AST by a single call of Pandoc. Previously it called pandoc for each cell. This change improves performance around 15X faster (#46). Note that #46 broken support for some input formats (e.g., commonmark) and old Pandoc (< 2.0.6), but the regression is already fixed (#53, #57).
+* `as_paragraph_md()` internally uses `flextable::chunk_dataframe()` in order to avoid potential problems if the **flextable** package changes the chunk structure in the future (#56, thanks @davidgohel).
+
+# ftExtra 0.1.1
 * Fix math not rendered on Windows with Pandoc < 2.10 (#33)
 * `math.lua` requires Pandoc >= 2.7.3 (#35)
 * Fix Pandoc < 2.7.3 raising error message "option --lua-filter requires an argument SCRIPTPATH". This is a regression from #35 (#37)

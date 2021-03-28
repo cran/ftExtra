@@ -81,7 +81,8 @@ data.frame(
 ## -----------------------------------------------------------------------------
 data.frame(
   package = "ftExtra^[Short of *flextable extra*]",
-  description = "Extensions for 'Flextable'^[Supports of footnotes]"
+  description = "Extensions for 'Flextable'^[Supports of footnotes]",
+  stringsAsFactors = FALSE
 ) %>%
   as_flextable() %>%
   colformat_md(
@@ -95,8 +96,20 @@ data.frame(
   flextable::autofit(add_w = 0.5)
 
 ## -----------------------------------------------------------------------------
+data.frame(x = 
+"foo[^a]^,^ [^b]
+
+[^a]: aaa
+
+[^b]: bbb",
+stringsAsFactors = FALSE
+) %>%
+  as_flextable() %>%
+  colformat_md()
+
+## -----------------------------------------------------------------------------
 data.frame(
-  R = sprintf("![](%s)", system.file("img", "Rlogo.jpg", package="jpeg")),
+  R = sprintf("![](%s)", file.path( R.home("doc"), "html", "logo.jpg" )),
   stringsAsFactors = FALSE
 ) %>%
   as_flextable() %>%
@@ -118,6 +131,11 @@ data.frame(linebreak = c("a\nb"), stringsAsFactors = FALSE) %>%
   as_flextable() %>%
   colformat_md(md_extensions = "+hard_line_breaks")
 
+## -----------------------------------------------------------------------------
+data.frame(linebreak = c("a\n\nb"), stringsAsFactors = FALSE) %>%
+  as_flextable() %>%
+  colformat_md(.sep = "\n\n")
+
 ## ---- echo=FALSE, collapse=FALSE, class.output="bibtex", warning=FALSE, comment=""----
 knitr::write_bib("ftExtra")
 
@@ -138,7 +156,7 @@ data.frame(
   stringsAsFactors = FALSE
 ) %>%
   as_flextable() %>%
-  colformat_md(pandoc_args = paste0("--bibliography=", tf)) %>%
+  colformat_md(pandoc_args = c("--bibliography", tf)) %>%
   flextable::autofit(add_w = 0.2)
 
 ## -----------------------------------------------------------------------------
@@ -152,4 +170,20 @@ data.frame(math = "$e^{i\\theta} = \\cos \\theta + i \\sin \\theta$",
 data.frame(emoji = c(":+1:"), stringsAsFactors = FALSE) %>%
   as_flextable() %>%
   colformat_md(md_extensions = "+emoji")
+
+## -----------------------------------------------------------------------------
+data.frame(
+  x = "H<sub>2</sub>O",
+  stringsAsFactors = FALSE
+) %>%
+  as_flextable() %>%
+  colformat_md(.from = "html")
+
+## -----------------------------------------------------------------------------
+data.frame(
+  x = "foo\n\nbar",
+  stringsAsFactors = FALSE
+) %>%
+  as_flextable() %>%
+  colformat_md(.from = "commonmark")
 
