@@ -4,7 +4,7 @@
 \alias{span_header}
 \title{Span the header based on delimiters}
 \usage{
-span_header(x, sep = "[_\\\\.]", theme_fun = flextable::theme_booktabs, ...)
+span_header(x, sep = "[_\\\\.]", theme_fun = NULL, ...)
 }
 \arguments{
 \item{x}{A \code{flextable} object`}
@@ -20,7 +20,9 @@ values start at 1 at the far-left of the string; negative value start at -1 at
 the far-right of the string. The length of \code{sep} should be one less than
 \code{into}.}
 
-\item{theme_fun}{deprecated, use \code{\link[flextable:set_flextable_defaults]{set_flextable_defaults()}} instead.}
+\item{theme_fun}{A flextable theme function.
+When \code{NULL} (default), the value is resolved by
+\code{flextable::get_flextable_defaults()}.}
 
 \item{...}{Passed to \code{theme_fun}}
 }

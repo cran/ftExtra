@@ -26,8 +26,9 @@ colformat_md <- function(x,
                          auto_color_link = "blue",
                          md_extensions = NULL,
                          pandoc_args = NULL,
+                         metadata = rmarkdown::metadata,
                          replace_na = "",
-                         .from = "markdown+autolink_bare_uris",
+                         .from = "markdown+autolink_bare_uris-raw_html-raw_attribute",
                          .footnote_options = footnote_options(),
                          .sep = "\n\n"
 ) {
@@ -39,9 +40,9 @@ colformat_md <- function(x,
     for (part in c("header", "body")) {
       x <- colformat_md(x, j = !!.j, part = part,
                         auto_color_link = auto_color_link,
-                        pandoc_args = pandoc_args, replace_na = replace_na,
-                        .from = .from, .footnote_options = .footnote_options,
-                        .sep = .sep)
+                        pandoc_args = pandoc_args, metadata = metadata,
+                        replace_na = replace_na, .from = .from,
+                        .footnote_options = .footnote_options, .sep = .sep)
       .footnote_options$value <- list()
     }
     return(x)
@@ -67,13 +68,14 @@ colformat_md <- function(x,
                              .from = .from,
                              md_extensions = md_extensions,
                              pandoc_args = pandoc_args,
+                             metadata = metadata,
                              replace_na = replace_na,
                              .footnote_options = .footnote_options,
                              .sep = .sep
                            ))
 
   structure(
-    add_footnotes(ft, part, .footnote_options),
+    add_footnotes(ft, .footnote_options),
     class = c("ftExtra", class(ft)),
     citations = collect_citations(paste(texts, collapse = "\n\n"))
   )

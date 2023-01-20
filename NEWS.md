@@ -1,4 +1,20 @@
-# ftExtra 0.3.1
+# ftExtra 0.5.0
+
+* Fix `as_flextable.grouped_df` which broke second and subsequent group variables. Also, this function gains `groups_arrange` argument. The default value is `NULL` which implies `FALSE` for the backward-compatibility. In the next version, `NULL` remains the default but becomes deprecated. Then, `TRUE` becomes the default in the subsequent release (thanks, @eitsupi, #76).
+
+* `as_paragraph_md` and `colformat_md` gains the `metadata` argument with the default value `rmarkdown::metadata` (#78).
+
+* `as_flextable.grouped_df` uses `dplyr::group_vars` to get names of grouping variables, and remove an internal synonym (#79).
+
+* `as_paragraph_md` and `colformat_md` disables two Pandoc extentions, `raw_html` and `raw_attribute`. Previously, these synstaxes raised errors on formatting (#80).
+
+* mention **ftExtra** respects `csl` field in the YAML front matter (#83).
+
+* Fix a performance issue on `colformat_md` when using footnotes (#85).
+
+* `separate_header` and `span_header` now refers to `flextable::get_flextable_defaults()` to find default value for `theme_fun` (#86).
+
+# ftExtra 0.4.0
 
 * `as_paragraph_md` supports empty string, `""`, as an input (#68).
 * `colformat_md` applies on actual content of flextable rather than input dataset (#72).

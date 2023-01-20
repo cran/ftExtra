@@ -34,7 +34,9 @@ ft <- flextable::flextable(df)
 
 for (i in seq(nrow(df))) {
   ft <- flextable::compose(
-    ft, i = i, j = "Oxide",
+    ft,
+    i = i,
+    j = "Oxide",
     value = flextable::as_paragraph(
       list_values = df$Oxide[i] %>%
         stringr::str_replace_all("([2-9]+)", " \\1 ") %>%
@@ -61,8 +63,10 @@ data.frame(
   a = c("**bold**", "*italic*"),
   b = c("^superscript^", "~subscript~"),
   c = c("`code`", "[underline]{.underline}"),
-  d = c("*[**~ft~^Extra^**](https://ftextra.atusy.net/) is*",
-        "[Cool]{.underline shading.color='skyblue'}"),
+  d = c(
+    "*[**~ft~^Extra^**](https://ftextra.atusy.net/) is*",
+    "[Cool]{.underline shading.color='skyblue'}"
+  ),
   stringsAsFactors = FALSE
 ) %>%
   as_flextable() %>%
@@ -86,30 +90,33 @@ data.frame(
 ) %>%
   as_flextable() %>%
   colformat_md(
-    .footnote_options = footnote_options(ref = "i",
-                                         prefix = '[',
-                                         suffix = ']',
-                                         start = 2,
-                                         inline = TRUE,
-                                         sep = "; ")
+    .footnote_options = footnote_options(
+      ref = "i",
+      prefix = "[",
+      suffix = "]",
+      start = 2,
+      inline = TRUE,
+      sep = "; "
+    )
   ) %>%
   flextable::autofit(add_w = 0.5)
 
 ## -----------------------------------------------------------------------------
-data.frame(x = 
-"foo[^a]^,^ [^b]
+data.frame(
+  x =
+    "foo[^a]^,^ [^b]
 
 [^a]: aaa
 
 [^b]: bbb",
-stringsAsFactors = FALSE
+  stringsAsFactors = FALSE
 ) %>%
   as_flextable() %>%
   colformat_md()
 
 ## -----------------------------------------------------------------------------
 data.frame(
-  R = sprintf("![](%s)", file.path( R.home("doc"), "html", "logo.jpg" )),
+  R = sprintf("![](%s)", file.path(R.home("doc"), "html", "logo.jpg")),
   stringsAsFactors = FALSE
 ) %>%
   as_flextable() %>%
@@ -148,7 +155,7 @@ knitr::write_bib("ftExtra")
 #    colformat_md() %>%
 #    flextable::autofit(add_w = 0.2)
 
-## ---- echo=FALSE, warning=FALSE-----------------------------------------------
+## ---- echo=FALSE, warning=FALSE, error=TRUE-----------------------------------
 tf <- tempfile(fileext = ".bib")
 knitr::write_bib("ftExtra", tf)
 data.frame(
@@ -160,8 +167,10 @@ data.frame(
   flextable::autofit(add_w = 0.2)
 
 ## -----------------------------------------------------------------------------
-data.frame(math = "$e^{i\\theta} = \\cos \\theta + i \\sin \\theta$",
-           stringsAsFactors = FALSE) %>%
+data.frame(
+  math = "$e^{i\\theta} = \\cos \\theta + i \\sin \\theta$",
+  stringsAsFactors = FALSE
+) %>%
   as_flextable() %>%
   colformat_md() %>%
   flextable::autofit(add_w = 0.2)

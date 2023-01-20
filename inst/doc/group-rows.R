@@ -39,8 +39,11 @@ grouped_iris %>%
 
 ## -----------------------------------------------------------------------------
 grouped_mtcars %>%
-  as_flextable(groups_to = "merged") %>%
-  flextable::theme_vanilla()
+  as_flextable(groups_to = "merged", groups_arrange = TRUE)
+
+## -----------------------------------------------------------------------------
+grouped_mtcars %>%
+  as_flextable(groups_to = "merged", groups_arrange = FALSE)
 
 ## -----------------------------------------------------------------------------
 grouped_mtcars %>%
