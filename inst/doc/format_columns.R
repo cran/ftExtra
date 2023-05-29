@@ -32,7 +32,7 @@ ft %>%
 df <- data.frame(Oxide = c("SiO2", "Fe2O3"), stringsAsFactors = FALSE)
 ft <- flextable::flextable(df)
 
-for (i in seq(nrow(df))) {
+for (i in seq_len(nrow(df))) {
   ft <- flextable::compose(
     ft,
     i = i,
@@ -54,7 +54,9 @@ ft
 df <- data.frame(Oxide = c("SiO2", "Fe2O3"), stringsAsFactors = FALSE)
 
 df %>%
-  dplyr::mutate(Oxide = stringr::str_replace_all(Oxide, "([2-9]+)", "~\\1~")) %>%
+  dplyr::mutate(
+    Oxide = stringr::str_replace_all(Oxide, "([2-9]+)", "~\\1~")
+  ) %>%
   flextable::flextable() %>%
   ftExtra::colformat_md()
 
@@ -113,6 +115,48 @@ data.frame(
 ) %>%
   as_flextable() %>%
   colformat_md()
+
+## -----------------------------------------------------------------------------
+#' Custom formatter of reference symbols
+#'
+#' @param n n-th reference symbol (integer)
+#' @param part where footnote exists: "body" or "header"
+#' @param footer whether to format symbols in the footer: `TRUE` or `FALSE`
+#'
+#' @return a character vector which will further be processed as markdown texts
+ref <- function(n, part, footer) {
+  # Header uses letters and body uses integers for the symbols
+  s <- if (part == "header") {
+    letters[n]
+  } else {
+    as.character(n)
+  }
+
+  # Suffix symbols with ": " (a colon and a space) in the footer
+  if (footer) {
+    return(paste0(s, ":\\ "))
+  }
+
+  # Use superscript in the header and the body
+  return(paste0("^", s, "^"))
+}
+
+# Apply custom function to format a table with footnotes
+tibble::tibble(
+  "header1^[note a]" = c("x^[note 1]", "y"),
+  "header2" = c("a", "b^[note 2]")
+) %>%
+  as_flextable() %>%
+  # process header first
+  colformat_md(
+    part = "header", .footnote_options = footnote_options(ref = ref)
+  ) %>%
+  # process body next
+  colformat_md(
+    part = "body", .footnote_options = footnote_options(ref = ref)
+  ) %>%
+  # tweak width for visibility
+  flextable::autofit(add_w = 0.2)
 
 ## -----------------------------------------------------------------------------
 data.frame(
