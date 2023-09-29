@@ -42,13 +42,13 @@ Configure options for footnotes.
 }
 \examples{
 # A examole flextable with unprocessed markdown footnotes
-ft <- as_flextable(tibble::tibble(
+ft <- flextable(tibble::tibble(
   "header1^[note a]" = c("x^[note 1]", "y"),
   "header2" = c("a", "b^[note 2]")
 ))
 
 # Render all footnotes in the same format.
-if (rmarkdown::pandoc_available()) {
+if (rmarkdown::pandoc_available("2.0.6")) {
   ft \%>\%
     colformat_md(
       part = "all",
@@ -57,7 +57,7 @@ if (rmarkdown::pandoc_available()) {
 }
 
 # Use a user-defined function to format footnote symbols
-if (rmarkdown::pandoc_available()) {
+if (rmarkdown::pandoc_available("2.0.6")) {
   # a function to format symbols of footnote references
   ref <- function(n, part, footer) {
     # Change symbols by context
