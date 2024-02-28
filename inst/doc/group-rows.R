@@ -20,7 +20,7 @@ grouped_iris <- iris %>%
 
 grouped_mtcars <- mtcars %>%
   mutate(model = rownames(mtcars)) %>%
-  head %>%
+  head() %>%
   select(model, cyl, mpg, disp, am) %>%
   group_by(am, cyl)
 

@@ -7,11 +7,14 @@ lua <- function(...) {
 }
 
 lua_filters <- function(.sep = "\n\n") {
-  if (!rmarkdown::pandoc_available("2")) return(NULL)
+  if (!rmarkdown::pandoc_available("2")) {
+    return(NULL)
+  }
 
   c(
     lua("smart.lua"),
     lua("inline-code.lua"),
+    lua("horizontal-rule.lua"),
     if (rmarkdown::pandoc_available("2.7.3")) {
       c(
         lua("math.lua"),
