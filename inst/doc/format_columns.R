@@ -158,7 +158,7 @@ tibble::tibble(
   # tweak width for visibility
   flextable::autofit(add_w = 0.2)
 
-## -----------------------------------------------------------------------------
+## ----eval=knitr::opts_chunk$get("eval") && requireNamespace("magick", quietly = TRUE)----
 data.frame(
   R = sprintf("![](%s)", file.path(R.home("doc"), "html", "logo.jpg")),
   stringsAsFactors = FALSE
@@ -187,19 +187,36 @@ data.frame(linebreak = c("a\n\nb"), stringsAsFactors = FALSE) %>%
   flextable() %>%
   colformat_md(.sep = "\n\n")
 
+## -----------------------------------------------------------------------------
+data.frame(
+  bullets = "- **ABCD**\n\n- EFG",
+  numbered = "3. ABCD\n4. EFG",
+  stringsAsFactors = FALSE
+) %>%
+  flextable() %>%
+  colformat_md(.sep = "\n") %>%
+  flextable::autofit()
+
+## ----eval=FALSE---------------------------------------------------------------
+# colformat_md(ft, metadata = list(
+#   bibliography = "references.bib",
+#   csl = "style.csl"
+# ))
+
 ## ----echo=FALSE, collapse=FALSE, class.output="bibtex", warning=FALSE, comment=""----
 knitr::write_bib("ftExtra")
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  data.frame(
-#    Cite = c("@R-ftExtra", "[@R-ftExtra]", "[-@R-ftExtra]"),
-#    stringsAsFactors = FALSE
-#  ) %>%
-#    flextable() %>%
-#    colformat_md() %>%
-#    flextable::autofit(add_w = 0.2)
+# data.frame(
+#   Cite = c("@R-ftExtra", "[@R-ftExtra]", "[-@R-ftExtra]"),
+#   stringsAsFactors = FALSE
+# ) %>%
+#   flextable() %>%
+#   colformat_md() %>%
+#   flextable::autofit(add_w = 0.2)
 
 ## ----echo=FALSE, warning=FALSE, error=TRUE------------------------------------
+try({
 tf <- tempfile(fileext = ".bib")
 knitr::write_bib("ftExtra", tf)
 data.frame(
@@ -209,6 +226,7 @@ data.frame(
   flextable() %>%
   colformat_md(pandoc_args = c("--bibliography", tf)) %>%
   flextable::autofit(add_w = 0.2)
+})
 
 ## -----------------------------------------------------------------------------
 data.frame(

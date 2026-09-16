@@ -10,8 +10,8 @@ library(ftExtra)
 library(dplyr)
 
 ## ----setup2, ref.label='setup', eval=FALSE------------------------------------
-#  library(ftExtra)
-#  library(dplyr)
+# library(ftExtra)
+# library(dplyr)
 
 ## -----------------------------------------------------------------------------
 grouped_iris <- iris %>%

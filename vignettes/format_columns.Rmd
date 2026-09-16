@@ -150,6 +150,7 @@ Supported syntax are
 - footnote
 - image
 - line break
+- bullet and ordered lists
 - citations
 - math
 - attributes with Span, Link, Code, and so on
@@ -280,8 +281,12 @@ Some notes:
 
 Images can be inserted optionally with width and/or height attributes.
 Specifying one of them changes the other while keeping the aspect ratio.
+When either dimension is omitted, the optional **magick** package is required
+to read the image dimensions. With neither specified, dimensions are calculated
+at 72 pixels per inch, following `flextable::as_image()`.
+Specify both dimensions (in inches) to avoid automatic sizing.
 
-```{r}
+```{r, eval=knitr::opts_chunk$get("eval") && requireNamespace("magick", quietly = TRUE)}
 data.frame(
   R = sprintf("![](%s)", file.path(R.home("doc"), "html", "logo.jpg")),
   stringsAsFactors = FALSE
@@ -329,11 +334,52 @@ data.frame(linebreak = c("a\n\nb"), stringsAsFactors = FALSE) %>%
   colformat_md(.sep = "\n\n")
 ```
 
+# Lists
+
+Markdown list items are rendered with text markers and separated by `.sep`
+(default: `"\n\n"`). Use `.sep = "\n"` for more compact lists.
+Bullet markers are normalized to `•`, and ordered markers to decimal numbers,
+starting at the number parsed by Pandoc. Nested lists are indented by two spaces
+per level. Inline formatting such as bold, italic, and links is preserved.
+List markers are plain text within a single cell paragraph.
+
+```{r}
+data.frame(
+  bullets = "- **ABCD**\n\n- EFG",
+  numbered = "3. ABCD\n4. EFG",
+  stringsAsFactors = FALSE
+) %>%
+  flextable() %>%
+  colformat_md(.sep = "\n") %>%
+  flextable::autofit()
+```
+
 # Citations
 
 Citations is experimentally supported.
 Note that there are no citation lists.
 It is expected to be produced by using R Markdown.
+
+In Quarto 1.8 or later, `colformat_md()` and `as_paragraph_md()` automatically
+use the resolved metadata provided by Quarto during rendering. This includes
+bibliography and CSL settings inherited from a book's `_quarto.yml`, directory
+metadata, and active profiles. Citation resource paths follow the source
+document even when `execute-dir: project` changes the R working directory.
+Names not found there remain available to Pandoc's `--resource-path` and
+built-in CSL lookup.
+
+With older Quarto versions, or outside rendering, pass the metadata explicitly:
+
+```{r, eval=FALSE}
+colformat_md(ft, metadata = list(
+  bibliography = "references.bib",
+  csl = "style.csl"
+))
+```
+
+Explicit paths are relative to the R working directory. An explicit `metadata`
+value takes precedence over automatic detection; use `metadata = list()` to
+disable inherited metadata. R Markdown continues to use `rmarkdown::metadata`.
 
 First, create a `ftExtra.bib` file like below.
 

@@ -41,13 +41,28 @@ organize <- function(md_df, auto_color_link, .solve_footnote) {
 }
 
 construct_chunk <- function(x, auto_color_link = "blue") {
+  width <- image_size(x$Image, "width")
+  height <- image_size(x$Image, "height")
+  for (i in seq_along(x$Image)) {
+    if (!is.null(x$Image[[i]]) && (is.na(width[i]) || is.na(height[i]))) {
+      size <- flextable::as_image(src = x$Image[[i]])
+      if (!is.na(width[i])) {
+        height[i] <- width[i] * size$height / size$width
+      } else if (!is.na(height[i])) {
+        width[i] <- height[i] * size$width / size$height
+      } else {
+        width[i] <- size$width
+        height[i] <- size$height
+      }
+    }
+  }
   flextable::chunk_dataframe(
     txt = x$txt %||% "", # x can be empty list when input is empty string
     italic = x$Emph %||% NA,
     bold = x$Strong %||% NA,
     url = x$Link %||% NA_character_,
-    width = image_size(x$Image, "width"),
-    height = image_size(x$Image, "height"),
+    width = width,
+    height = height,
     vertical.align = vertical_align(x$Superscript, x$Subscript),
     underlined = x$Underline %||% NA,
     color = x$color %||% NA_character_,
@@ -76,9 +91,15 @@ construct_chunk <- function(x, auto_color_link = "blue") {
 #'   formats specified to `.from` can be used. See
 #'   <https://www.pandoc.org/MANUAL.html#extensions> for details.
 #' @param metadata
-#'   A list of metadata, typically the parsed result of the YAML front matter
-#'   (default: `rmarkdown::metadata`). This value is used iff the `.from`
-#'   argument specifies the input format that supports the YAML metadata blocks.
+#'   A list of metadata, typically the parsed result of the YAML front matter.
+#'   By default, uses resolved Quarto execution metadata when
+#'   `QUARTO_EXECUTE_INFO` is set (Quarto 1.8 or later), otherwise
+#'   `rmarkdown::metadata`. Explicit values, including `NULL` or `list()`,
+#'   override this default. Inherited bibliography, CSL, and citation-abbreviation
+#'   paths are resolved relative to the Quarto source document when the file
+#'   exists there; other names retain Pandoc's resource lookup.
+#'   This value is used iff the `.from` argument specifies an input format
+#'   that supports YAML metadata blocks.
 #' @param replace_na A value to replace `NA` (default = `""`).
 #' @param .from
 #'   Pandoc's `--from` argument (default: `'markdown+autolink_bare_uris'`).
@@ -106,7 +127,7 @@ as_paragraph_md <- function(
     auto_color_link = "blue",
     md_extensions = NULL,
     pandoc_args = NULL,
-    metadata = rmarkdown::metadata,
+    metadata = render_metadata(),
     replace_na = "",
     .from = "markdown+autolink_bare_uris-raw_html-raw_attribute",
     .footnote_options = NULL,
@@ -151,7 +172,7 @@ as_paragraph_md <- function(
         return(construct_chunk(list()))
       }
       y <- x %>%
-        md2df(pandoc_args = pandoc_args, .from = .from) %>%
+        md2df(pandoc_args = pandoc_args, metadata = metadata, .from = .from) %>%
         .solve_footnote() %>%
         as.list()
       construct_chunk(as.list(y), auto_color_link)

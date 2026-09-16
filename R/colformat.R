@@ -7,7 +7,7 @@
 #'   One of "body", "header", and "all". If "all", formatting proceeds in the
 #'   order of "header" and "body".
 #' @param .sep
-#'   A separator of paragraphs (default: `"\n\n"`)
+#'   A separator of paragraphs and list items (default: `"\n\n"`)
 #' @inheritParams as_paragraph_md
 #'
 #' @examples
@@ -26,7 +26,7 @@ colformat_md <- function(x,
                          auto_color_link = "blue",
                          md_extensions = NULL,
                          pandoc_args = NULL,
-                         metadata = rmarkdown::metadata,
+                         metadata = render_metadata(),
                          replace_na = "",
                          .from = "markdown+autolink_bare_uris-raw_html-raw_attribute",
                          .footnote_options = footnote_options(),
@@ -41,6 +41,7 @@ colformat_md <- function(x,
       x <- colformat_md(x,
         j = !!.j, part = part,
         auto_color_link = auto_color_link,
+        md_extensions = md_extensions,
         pandoc_args = pandoc_args, metadata = metadata,
         replace_na = replace_na, .from = .from,
         .footnote_options = .footnote_options, .sep = .sep
